@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Спасибо за заказ!</h1>
+{% if order.user_order_no %}
+  <p>Ваш номер заказа: <strong>{{ order.id }}</strong></p>
+{% endif %}
+<p>Статус: {{ order.status }}</p>
+{% set safe_total = (total if (total is defined and total is not none) else order_total(order)) %}
+<p class="total">Итого: <strong>{{ '%.2f'|format(safe_total) }} ₽</strong></p>
+<p><a href="{{ url_for('shop.index') }}">Вернуться в каталог</a></p>
+{% endblock %}

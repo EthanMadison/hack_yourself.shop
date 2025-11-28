@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Заказ № {{ order.id }}{% if order.user_order_no %}{% endif %}</h1>
+<p><strong>Дата:</strong> {{ order.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+<p><strong>Статус:</strong> {{ order.status }}</p>
+<p><strong>Получатель:</strong> {{ order.customer_name }} — {{ order.email }}</p>
+<p><strong>Адрес:</strong> {{ order.address }}</p>
+<h2>Состав заказа</h2>
+<table class="cart">
+  <thead>
+    <tr><th>Товар</th><th>Цена</th><th>Кол-во</th><th>Сумма</th></tr>
+  </thead>
+  <tbody>
+    {% for it in order.items %}
+      <tr>
+        <td>{{ it.product.name if it.product else 'Товар' }}</td>
+        <td>{{ '%.2f'|format(it.price_snapshot) }} ₽</td>
+        <td>{{ it.quantity }}</td>
+        <td>{{ '%.2f'|format(it.price_snapshot * it.quantity) }} ₽</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<p class="total">Итого: <strong>{{ '%.2f'|format(order_total(order)) }} ₽</strong></p>
+<p><a href="{{ url_for('auth.account') }}">← Назад к истории заказов</a></p>
+{% endblock %}

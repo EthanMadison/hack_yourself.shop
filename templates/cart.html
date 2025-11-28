@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Корзина</h1>
+{% if not items %}
+  <p>Корзина пуста.</p>
+{% else %}
+<form action="{{ url_for('shop.cart_update') }}" method="post" id="cart-form">
+  <table class="cart" id="cart-table">
+    <thead>
+      <tr><th>Товар</th><th>Цена</th><th>Кол-во</th><th>Сумма</th></tr>
+    </thead>
+    <tbody>
+    {% for row in items %}
+      <tr data-pid="{{ row.product.id }}">
+        <td>{{ row.product.name }}</td>
+        <td class="price-each">{{ '%.2f'|format(row.product.price) }} ₽</td>
+        <td>
+          <input type="number" class="qty-input" name="qty_{{ row.product.id }}" value="{{ row.qty }}" min="0" step="1">
+        </td>
+        <td class="line-total"><span id="line-total-{{ row.product.id }}">{{ '%.2f'|format(row.line_total) }}</span> ₽</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  <div class="actions"><button type="submit">Обновить</button></div>
+</form>
+<p class="total">Итого: <strong><span id="cart-total">{{ '%.2f'|format(total) }}</span> ₽</strong></p>
+<form action="{{ url_for('shop.cart_clear') }}" method="post" style="display:inline-block;margin-top:8px;">
+  <button type="submit" class="linklike">Очистить корзину</button>
+</form>
+<p><a class="button" href="{{ url_for('shop.checkout') }}">Оформить заказ</a></p>
+{% endif %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const table = document.getElementById('cart-table');
+  const totalEl = document.getElementById('cart-total');
+  const counterEl = document.getElementById('cart-counter');
+
+  function debounce(fn, ms = 300) {
+    let t;
+    return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
+  }
+  const debouncedSync = debounce(syncCart, 300);
+
+  async function syncCart() {
+    const items = [];
+    table.querySelectorAll('tbody tr').forEach(row => {
+      const pid = row.getAttribute('data-pid');
+      const qtyInput = row.querySelector('.qty-input');
+      if (!pid || !qtyInput) return;
+      const qty = Math.max(0, parseInt(qtyInput.value || '0', 10) || 0);
+      items.push({ pid, qty });
+    });
+
+    try {
+      const resp = await fetch('{{ url_for("shop.cart_update_api") }}', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+        body: JSON.stringify({ items })
+      });
+      if (!resp.ok) throw new Error('Network error');
+      const data = await resp.json();
+      if (!data.ok) return;
+
+      for (const [pid, lineTotal] of Object.entries(data.lines)) {
+        const span = document.getElementById(`line-total-${pid}`);
+        if (span) span.textContent = Number(lineTotal).toFixed(2);
+      }
+      table.querySelectorAll('tbody tr').forEach(row => {
+        const pid = row.getAttribute('data-pid');
+        if (!(pid in data.lines)) row.remove();
+      });
+
+      if (totalEl) totalEl.textContent = Number(data.total).toFixed(2);
+      if (counterEl) counterEl.textContent = data.cart_size;
+
+      if (Object.keys(data.lines).length === 0) location.reload();
+    } catch (e) { console.error(e); }
+  }
+
+  table.addEventListener('input', e => { if (e.target.classList.contains('qty-input')) debouncedSync(); });
+  table.addEventListener('change', e => { if (e.target.classList.contains('qty-input')) debouncedSync(); });
+});
+</script>
+{% endblock %}

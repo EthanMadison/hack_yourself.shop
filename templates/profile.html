@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Профиль пользователя</h1>
+
+<form method="post" enctype="multipart/form-data">
+    <input type="hidden" name="action" value="save_profile">
+
+    <label>Полное имя:
+        <input type="text" name="full_name" value="{{ user.full_name }}">
+    </label>
+
+    <label>Адрес по умолчанию:
+        <textarea name="default_address">{{ user.default_address }}</textarea>
+    </label>
+
+    <label>Аватар:
+        <input type="file" name="avatar">
+    </label>
+
+    <div class="avatar-block">
+        {% if user.avatar %}
+            <p>Текущий аватар:</p>
+            <img src="{{ url_for('static', filename=user.avatar) }}" class="avatar-preview" alt="avatar">
+        {% else %}
+            <p class="muted">Используется аватар по умолчанию</p>
+            <img src="{{ url_for('static', filename='img/default_avatar.png') }}" class="avatar-preview" alt="avatar">
+        {% endif %}
+
+        <button type="submit">Сохранить профиль</button>
+    </div>
+
+</form>
+
+<hr>
+
+<h2>Смена пароля</h2>
+<form method="post">
+    <input type="hidden" name="action" value="change_password">
+
+    <label>Текущий пароль:
+        <input type="password" name="current_password" required>
+    </label>
+
+    <label>Новый пароль:
+        <input type="password" name="new_password" required>
+    </label>
+
+    <label>Повтор нового пароля:
+        <input type="password" name="new_password2" required>
+    </label>
+
+    <p class="muted">Минимум 6 символов, 1 заглавная буква, 1 цифра, 1 спецсимвол.</p>
+
+    <button type="submit">Изменить пароль</button>
+</form>
+
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Личный кабинет</h1>
+<p class="muted" style="display:flex;align-items:center;gap:8px;">
+  <img class="user-avatar" src="{{ url_for('static', filename=avatar_url_for(current_user)) }}"
+       alt="avatar" style="width:28px;height:28px;border-radius:50%;object-fit:cover;border:1px solid #ddd;">
+  {% set display_name = (current_user.full_name | default('', true) | trim) %}
+  Вы вошли как: <strong>{{ display_name if display_name else current_user.email }}</strong>
+</p>
+<h2>История заказов</h2>
+{% if not orders %}
+  <p>У вас пока нет заказов.</p>
+{% else %}
+  <table class="cart">
+    <thead>
+      <tr>
+        <th >№</th>
+        <th>Дата</th>
+        <th>Статус</th>
+        <th>Состав</th>
+        <th>Сумма</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for o in orders %}
+      <tr>
+        <td>{{ o.id }}{% if o.user_order_no %}{% endif %}</td>
+        <td>{{ o.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+        <td>{{ o.status }}</td>
+        <td>
+          <ul>
+            {% for it in o.items %}
+              <li>{{ it.product.name if it.product else 'Товар' }} × {{ it.quantity }}</li>
+            {% endfor %}
+          </ul>
+        </td>
+        <td>{{ '%.2f'|format(order_total(o)) }} ₽</td>
+        <td><a href="{{ url_for('auth.account_order', order_id=o.id) }}">Детали</a></td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% endif %}
+{% endblock %}

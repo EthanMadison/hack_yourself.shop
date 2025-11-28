@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block content %}
+<article class="product">
+  <img src="{{ url_for('static', filename=product.image or 'img/placeholder.jpg') }}" alt="{{ product.name }}">
+  <div>
+    <h1>{{ product.name }}</h1>
+    <p class="price">{{ '%.2f'|format(product.price) }} ₽</p>
+    <p>{{ product.description }}</p>
+    <div class="buy-box">
+      {% set qty_in_cart = (session.get('cart') or {}).get(product.id|string) %}
+      {% if qty_in_cart %}
+        <button type="button" disabled class="in-cart" data-pid="{{ product.id }}">В корзине ({{ qty_in_cart }})</button>
+      {% else %}
+        <button type="button" class="add-to-cart" data-pid="{{ product.id }}">В корзину</button>
+      {% endif %}
+    </div>
+  </div>
+</article>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  function updateCartLink(size) {
+    const c = document.getElementById('cart-counter'); if (c) c.textContent = size;
+  }
+  async function addToCart(pid, qty, btn) {
+    try {
+      const resp = await fetch(`/cart/add/${pid}`, {
+        method: 'POST',
+        headers: {'X-Requested-With': 'XMLHttpRequest', 'Content-Type': 'application/x-www-form-urlencoded'},
+        body: new URLSearchParams({ qty: String(qty || 1) })
+      });
+      if (!resp.ok) throw new Error('Network error');
+      const data = await resp.json();
+      if (data.ok) {
+        const nb = document.createElement('button'); nb.className='in-cart'; nb.disabled=true;
+        nb.textContent = `В корзине (${data.qty})`; btn.replaceWith(nb); updateCartLink(data.cart_size);
+      }
+    } catch(e){ console.error(e); }
+  }
+  document.querySelectorAll('.add-to-cart').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const wrapper = btn.closest('.buy-box') || document;
+      const qtyInput = wrapper.querySelector('.qty-input');
+      let qty = 1; if (qtyInput && qtyInput.value) qty = Math.max(1, parseInt(qtyInput.value, 10) || 1);
+      addToCart(btn.dataset.pid, qty, btn);
+    });
+  });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Заказы</h1>
+<table class="cart">
+  <thead><tr><th>ID</th><th>Дата</th><th>Клиент</th><th>Email</th><th>Адрес</th><th>Состав</th><th>Сумма</th><th>Статус</th><th>Действия</th></tr></thead>
+  <tbody>
+    {% for o in orders %}
+      <tr>
+        <td>#{{ o.id }}</td>
+        <td>{{ o.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+        <td>{{ o.customer_name }}</td>
+        <td>{{ o.email }}</td>
+        <td>{{ o.address }}</td>
+        <td>
+          <ul>
+          {% for it in o.items %}
+            <li>{{ it.product.name if it.product else 'Товар' }} × {{ it.quantity }} — {{ '%.2f'|format(it.price_snapshot * it.quantity) }} ₽</li>
+          {% endfor %}
+          </ul>
+        </td>
+        <td>{{ '%.2f'|format(order_total(o)) }} ₽</td>
+        <td>{{ o.status }}</td>
+        <td>
+          <form action="{{ url_for('admin.order_status', order_id=o.id) }}" method="post" style="display:inline">
+            <input type="hidden" name="status" value="paid"><button type="submit">Оплачено</button>
+          </form>
+          <form action="{{ url_for('admin.order_status', order_id=o.id) }}" method="post" style="display:inline">
+            <input type="hidden" name="status" value="canceled"><button type="submit">Платёж отменён</button>
+          </form>
+          <form action="{{ url_for('admin.order_status', order_id=o.id) }}" method="post" style="display:inline">
+            <input type="hidden" name="status" value="awaiting_payment"><button type="submit">Ожидание платежа</button>
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

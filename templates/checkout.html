@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Оформление заказа</h1>
+{% if not items %}
+  <p>Корзина пуста.</p>
+{% else %}
+  <ul>
+    {% for row in items %}
+      <li>{{ row.product.name }} × {{ row.qty }} — {{ '%.2f'|format(row.line_total) }} ₽</li>
+    {% endfor %}
+  </ul>
+  <p class="total">Итого: <strong>{{ '%.2f'|format(total) }} ₽</strong></p>
+  <form method="post">
+    <label>Имя <input name="name" required></label>
+    <label>Email <input type="email" name="email" required></label>
+    <label>Адрес доставки <textarea name="address" required></textarea></label>
+    <button type="submit">Подтвердить заказ</button>
+  </form>
+{% endif %}
+{% endblock %}

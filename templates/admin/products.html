@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Товары</h1>
+<p><a class="button" href="{{ url_for('admin.product_new') }}">+ Новый товар</a></p>
+<table class="cart">
+  <thead><tr><th>ID</th><th>Название</th><th>Категория</th><th>Цена</th><th>Изображение</th><th></th></tr></thead>
+  <tbody>
+    {% for p in products %}
+      <tr>
+        <td>{{ p.id }}</td>
+        <td>{{ p.name }}</td>
+        <td>{{ p.category.name if p.category else '' }}</td>
+        <td>{{ '%.2f'|format(p.price) }} ₽</td>
+        <td>{% if p.image %}<img src="{{ url_for('static', filename=p.image) }}" alt="" style="height:40px">{% endif %}</td>
+        <td>
+          <a href="{{ url_for('admin.product_edit', pid=p.id) }}">Изменить</a>
+          <form action="{{ url_for('admin.product_delete', pid=p.id) }}" method="post" style="display:inline">
+            <button type="submit" class="linklike">Удалить</button>
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

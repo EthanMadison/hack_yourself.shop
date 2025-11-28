@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ 'Новая категория' if not category else 'Редактировать категорию' }}</h1>
+<form method="post">
+  <label>Название <input name="name" value="{{ category.name if category else '' }}" required></label>
+  <button type="submit">Сохранить</button>
+</form>
+{% endblock %}

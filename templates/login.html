@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Вход</h1>
+<form method="post">
+  <label>Email <input type="email" name="email" required></label>
+  <label>Пароль <input type="password" name="password" required></label>
+  <button type="submit">Войти</button>
+</form>
+<p><a href="{{ url_for('auth.password_forgot') }}">Забыли пароль?</a></p>
+<p>Нет аккаунта? <a href="{{ url_for('auth.register') }}">Зарегистрироваться</a></p>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Категории</h1>
+<p><a class="button" href="{{ url_for('admin.category_new') }}">+ Новая категория</a></p>
+<table class="cart">
+  <thead><tr><th>ID</th><th>Название</th><th></th></tr></thead>
+  <tbody>
+    {% for c in categories %}
+      <tr>
+        <td>{{ c.id }}</td>
+        <td>{{ c.name }}</td>
+        <td>
+          <a href="{{ url_for('admin.category_edit', cid=c.id) }}">Изменить</a>
+          <form action="{{ url_for('admin.category_delete', cid=c.id) }}" method="post" style="display:inline">
+            <button type="submit" class="linklike">Удалить</button>
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

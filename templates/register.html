@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Регистрация</h1>
+<form method="post">
+  <label>Email <input type="email" name="email" required></label>
+  <label>Пароль <input type="password" name="password" required></label>
+  <p class="muted">Требования: минимум 6 символов, 1 заглавная буква, 1 цифра и 1 спецсимвол.</p>
+  <button type="submit">Создать аккаунт</button>
+</form>
+<p>Уже есть аккаунт? <a href="{{ url_for('auth.login') }}">Войти</a></p>
+{% endblock %}
