@@ -39,8 +39,8 @@ class User(db.Model, UserMixin):
         """
         Устанавливает новый пароль пользователя, сохраняя только его хэш.
 
-        Хэш пароля вычисляется с помощью ``werkzeug.security.generate_password_hash``
-        и записывается в поле ``password_hash``. Сам пароль в базе данных не хранится.
+        Хэш пароля вычисляется с помощью 'werkzeug.security.generate_password_hash'
+        и записывается в поле 'password_hash'. Сам пароль в базе данных не хранится.
 
         Аргументы:
             password: Пароль в открытом виде, введённый пользователем.
@@ -54,14 +54,14 @@ class User(db.Model, UserMixin):
         """
         Проверяет корректность введённого пользователем пароля.
 
-        Сравнивает переданную строку с хэшем в поле ``password_hash`` с помощью
-        ``werkzeug.security.check_password_hash``.
+        Сравнивает переданную строку с хэшем в поле 'password_hash' с помощью
+        'werkzeug.security.check_password_hash'.
 
         Аргументы:
             password: Пароль в открытом виде, который нужно проверить.
 
         Возвращает:
-            bool: ``True``, если пароль верный, иначе ``False``.
+            bool: 'True', если пароль верный, иначе 'False'.
         """
         return check_password_hash(self.password_hash, password)
 
