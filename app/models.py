@@ -42,7 +42,7 @@ class User(db.Model, UserMixin):
         Хэш пароля вычисляется с помощью 'werkzeug.security.generate_password_hash'
         и записывается в поле 'password_hash'. Сам пароль в базе данных не хранится.
 
-        Аргументы:
+        Параметры:
             password: Пароль в открытом виде, введённый пользователем.
 
         Возвращает:
@@ -57,7 +57,7 @@ class User(db.Model, UserMixin):
         Сравнивает переданную строку с хэшем в поле 'password_hash' с помощью
         'werkzeug.security.check_password_hash'.
 
-        Аргументы:
+        Параметры:
             password: Пароль в открытом виде, который нужно проверить.
 
         Возвращает:
